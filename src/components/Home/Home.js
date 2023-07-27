@@ -6,7 +6,6 @@ import { auth, db, logout, firestore } from "../../service/firebase";
 
 function Home() {
   const [user, loading, error] = useAuthState(auth);
-  const [shit, setShit] = useState([{}]);
   const [loggedUser, setLoggedUser] = useState({})
   const navigate = useNavigate();
   const dataRef = useRef()
@@ -63,12 +62,14 @@ function Home() {
          <button className="dashboard__btn" onClick={logout}>
           Logout
          </button>
+         <div>username: {loggedUser?.username}</div>
          <div className="App">
           <form onSubmit={submithandler}>
             <input type= "text" ref={dataRef} />
             <button type = "submit">Change Username</button>
           </form>
           </div>
+          <button>click here to make a new room</button>
        </div>
      </div>
   );

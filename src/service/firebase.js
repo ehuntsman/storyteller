@@ -19,15 +19,20 @@ import {
   setDoc
 } from "firebase/firestore";
 import { getDatabase, ref, set, onValue } from "firebase/database";
+import envConfig from '../env-config';
+
+const envVars = envConfig();
+// Use your environment variables as needed, e.g.:
+// const apiKey = envVars.API_KEY;
 
 const firebaseConfig = {
-	apiKey: process.env.REACT_APP_apiKey,
-	authDomain: process.env.REACT_APP_authDomain,
-	projectId: process.env.REACT_APP_projectId,
-	storageBucket: process.env.REACT_APP_storageBucket,
-	messagingSenderId: process.env.REACT_APP_messagingSenderId,
-	appId: process.env.REACT_APP_appId,
-	measurementId: process.env.REACT_APP_measurementId
+	apiKey: envVars.apiKey,
+	authDomain: envVars.authDomain,
+	projectId: envVars.projectId,
+	storageBucket: envVars.storageBucket,
+	messagingSenderId: envVars.messagingSenderId,
+	appId: envVars.appId,
+	measurementId: envVars.measurementId
 };
 
 // Initialize Firebase

@@ -1,29 +1,19 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { query, collection, getDocs, where, addDoc, doc, setDoc } from "firebase/firestore";
 import { auth, db, logout, firestore } from "../../service/firebase";
+import { useUserContext } from "../../context/UserContext";
 
 function Home() {
-  const [user, loading, error] = useAuthState(auth);
-  const [loggedUser, setLoggedUser] = useState({})
+  const [stories, setStories] = useState([]);
+  const { user, loggedUser } = useUserContext();
   const navigate = useNavigate();
   const dataRef = useRef()
 
-  const fetchUser = async () => {
-    try {
-      const q = query(collection(firestore, "users"), where("uid", "==", user?.uid));
-      const doc = await getDocs(q);
-      const data = doc.docs[0].data();
-      setLoggedUser(data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   const handleSubmit = async (testdata) => {
     try {
-      const q = query(collection(firestore, "users"), where("uid", "==", user?.uid));
+      const q = query(collection(firestore, "users"), where("uid", "==", user.uid));
       const querySnapshot = await getDocs(q);
       
       if (!querySnapshot.empty) {
@@ -39,25 +29,45 @@ function Home() {
     }
   };
 
+  const getStories = async () => {
+    try {
+      const q = query(collection(firestore, "stories"), where("author", "==", user.uid));
+      const querySnapshot = await getDocs(q);
+      const storiesData = querySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          storyName: data.storyName,
+          author: data.author,
+          backgroundImageURL: data.backgroundImageURL,
+        };
+      });
+  
+      setStories(storiesData);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  
+
   useEffect(() => {
-    if (loading) return;
-    if (!user) return navigate("/");
-    fetchUser();
-  }, [user, loading]);
+    // this is causing issues for now
+    // if (!loggedUser) return navigate("/login");
+    getStories();
+  }, [loggedUser]);
 
   const submithandler = (e) => {
     e.preventDefault()
     handleSubmit(dataRef.current.value)
     dataRef.current.value = ""
   }
- 
 
   return (
     <div className="dashboard">
        <div className="dashboard__container">
         Logged in as
          <div>{loggedUser?.username}</div>
-         <div>{user?.email}</div>
+         <div>{loggedUser?.email}</div>
          <p>{loggedUser?.role}</p>
          <button className="dashboard__btn" onClick={logout}>
           Logout
@@ -69,7 +79,19 @@ function Home() {
             <button type = "submit">Change Username</button>
           </form>
           </div>
-          <button>click here to make a new room</button>
+          <Link to="/story/new">
+            click here to make a new story
+          </Link>
+          <h3>My stories</h3>
+          {stories.length > 0 ?
+          <ul>
+            {stories.map((story) => {
+              return (
+                <Link key={story.id} to={`/story/${story.id}`}>{story.storyName}</Link>
+              )
+            })}
+          </ul>
+          : <p>You have no stories created yet</p>}
        </div>
      </div>
   );

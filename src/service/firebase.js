@@ -19,26 +19,17 @@ import {
   setDoc
 } from "firebase/firestore";
 import { getDatabase, ref, set, onValue } from "firebase/database";
-import envConfig from '../env-config';
-
-const envVars = envConfig();
-// Use your environment variables as needed, e.g.:
-// const apiKey = envVars.API_KEY;
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-	apiKey: envVars.apiKey,
-	authDomain: envVars.authDomain,
-	projectId: envVars.projectId,
-	storageBucket: envVars.storageBucket,
-	messagingSenderId: envVars.messagingSenderId,
-	appId: envVars.appId,
-	measurementId: envVars.measurementId
+
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
+const storage = getStorage(app);
 const googleProvider = new GoogleAuthProvider();
 const firestore = getFirestore(app);
 
@@ -119,6 +110,7 @@ export {
   registerWithEmailAndPassword,
   sendPasswordReset,
   logout,
-  firestore
+  firestore,
+  storage
 };
 

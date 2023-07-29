@@ -1,19 +1,29 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Login from './components/Login/Login';
-import Home from './components/Home/Home';
+import Dashboard from './components/Dashboard/Dashboard';
 import Register from './components/Login/Register';
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
+import NewStory from './components/Stories/NewStory';
+import StoryHome from './components/Stories/StoryHome';
+import UserTemplate from './templates/UserTemplate';
+import { UserProvider } from './context/UserContext';
 
-function App() {  
+function App() {
   return (
     <div>
       <BrowserRouter>
-        <Routes>
-          <Route exact path="/" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<Home />} />
-        </Routes>
+        <UserProvider>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route element={<UserTemplate />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/story/new" element={<NewStory />} />
+              <Route path="/story/:id" element={<StoryHome />} />
+            </Route>
+          </Routes>
+        </UserProvider>
       </BrowserRouter>
     </div>
   );

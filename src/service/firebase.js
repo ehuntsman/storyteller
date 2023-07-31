@@ -99,6 +99,7 @@ const sendPasswordReset = async (email) => {
 };
 
 const logout = () => {
+  console.log("logout triggered")
   signOut(auth);
 };
 

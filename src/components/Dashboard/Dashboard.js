@@ -7,18 +7,19 @@ import { useUserContext } from "../../context/UserContext";
 
 function Home() {
   const [stories, setStories] = useState([]);
+  const [myStories, setMyStories] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { user, loggedUser } = useUserContext();
   const navigate = useNavigate();
   const dataRef = useRef()
 
   const handleSubmit = async (testdata) => {
     try {
-      const q = query(collection(firestore, "users"), where("uid", "==", user.uid));
+      const q = query(collection(firestore, "users"), where("uid", "==", loggedUser.uid));
       const querySnapshot = await getDocs(q);
-      
       if (!querySnapshot.empty) {
         const userDoc = querySnapshot.docs[0];
-        const userRef = doc(firestore, "users", userDoc.id); // Get the document reference
+        const userRef = doc(firestore, "users", userDoc.id);
         await setDoc(userRef, { username: testdata }, { merge: true });
         console.log("Username updated successfully");
       } else {
@@ -31,7 +32,7 @@ function Home() {
 
   const getStories = async () => {
     try {
-      const q = query(collection(firestore, "stories"), where("author", "==", user.uid));
+      const q = query(collection(firestore, "stories"), where("allowedUsers", "array-contains", user.uid));
       const querySnapshot = await getDocs(q);
       const storiesData = querySnapshot.docs.map((doc) => {
         const data = doc.data();
@@ -42,24 +43,29 @@ function Home() {
           backgroundImageURL: data.backgroundImageURL,
         };
       });
-  
       setStories(storiesData);
+      setLoading(false);
     } catch (err) {
       console.error(err);
+      setLoading(false);
     }
   };
   
 
   useEffect(() => {
-    // this is causing issues for now
-    // if (!loggedUser) return navigate("/login");
-    getStories();
-  }, [loggedUser]);
+    if(user){
+      getStories();
+    }
+  }, [user]);
 
   const submithandler = (e) => {
     e.preventDefault()
     handleSubmit(dataRef.current.value)
     dataRef.current.value = ""
+  }
+
+  if (loading || !loggedUser) {
+    return <div>Loading...</div>
   }
 
   return (
@@ -69,9 +75,6 @@ function Home() {
          <div>{loggedUser?.username}</div>
          <div>{loggedUser?.email}</div>
          <p>{loggedUser?.role}</p>
-         <button className="dashboard__btn" onClick={logout}>
-          Logout
-         </button>
          <div>username: {loggedUser?.username}</div>
          <div className="App">
           <form onSubmit={submithandler}>
@@ -87,11 +90,13 @@ function Home() {
           <ul>
             {stories.map((story) => {
               return (
-                <Link key={story.id} to={`/story/${story.id}`}>{story.storyName}</Link>
+                <li key={story.storyName}>
+                  <Link key={story.id} to={`/story/${story.id}`}>{story.storyName} {story.author === user?.uid && "created by me"}</Link>
+                </li>
               )
             })}
           </ul>
-          : <p>You have no stories created yet</p>}
+          : <p>You have no stories yet</p>}
        </div>
      </div>
   );

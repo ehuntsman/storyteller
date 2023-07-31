@@ -28,7 +28,7 @@ export default function NewStory() {
         const data = {
           storyName: storyName,
           author: user.uid,
-          allowedUsers:[{uid: user.uid, username: user.username}],
+          allowedUsers: [user.uid]
         };
         if (storyImgRef.current.files[0]) {
           const imageFile = storyImgRef.current.files[0];
@@ -42,7 +42,7 @@ export default function NewStory() {
           const downloadURL = await getDownloadURL(storageRef);
           data.backgroundImageURL = downloadURL;
         }
-
+  
         // Use addDoc to generate a random document ID and save the data
         const newStoryRef = await addDoc(collection(firestore, "stories"), data);
         console.log("data saved successfully", newStoryRef.id);
@@ -54,6 +54,7 @@ export default function NewStory() {
       console.log(err);
     }
   };
+  
 
   const createRoom = (e) => {
     e.preventDefault();

@@ -19,7 +19,7 @@ export default function StoryHome() {
         if (storyDocSnapshot.exists()) {
           const data = storyDocSnapshot.data();
           setStory(data);
-          getAllAllowedUsers();
+          getAllAllowedUsers(data);
         }
       } catch (err) {
         console.error(err);
@@ -28,13 +28,12 @@ export default function StoryHome() {
     getStory();
   }, [id]);
 
-  const getAllAllowedUsers = async () => {
+  const getAllAllowedUsers = async (data) => {
     // need to make a call to check because username may have changed since they last created it
     try {
       let users = [loggedUser.username];
-      console.log(story.allowedUsers, "these are the allowed users")
       await Promise.all(
-        story.allowedUsers.map(async (userId) => {
+        data.allowedUsers?.map(async (userId) => {
           const encodedUID = btoa(userId);
           console.log("this is the userid", userId, "and the encoded", encodedUID);
           const userRef = doc(firestore, "users", encodedUID);
@@ -54,16 +53,20 @@ export default function StoryHome() {
     }
   }
 
+  // this isn't working
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("saving user triggered")
     const userEmail = dataRef.current.value;
 
     // Look up the user by email and get their UID
     const userQuery = query(collection(firestore, "users"), where("email", "==", userEmail));
     const userQuerySnapshot = await getDocs(userQuery);
+    console.log("this is the user?", userQuerySnapshot)
     if (!userQuerySnapshot.empty) {
       const userDoc = userQuerySnapshot.docs[0];
-      const userUid = userDoc.id;
+      const userUid = userDoc.data().uid;
+      console.log("this is id", userUid, "and the username???", userDoc.data().username)
 
       // Add the user's UID to the "allowedUsers" array for the current story
       const storyDocRef = doc(firestore, "stories", id);
@@ -72,7 +75,9 @@ export default function StoryHome() {
       });
 
       // Update the local state to reflect the changes
-      setAllowedUsernames(oldArray => [...oldArray, userDoc.username]);
+      setAllowedUsernames(oldArray => [...oldArray, userDoc.data().username]);
+      // Clear the form
+      dataRef.current.value = "";
     } else {
       console.log("User not found");
     }
@@ -89,7 +94,9 @@ export default function StoryHome() {
       <p>Allowed Users:</p>
       <ul>
         {allowedUsernames.map((allowedUser) => {
-          return <li key={allowedUser}>{allowedUser}</li>;
+          if(allowedUser) {
+            return <li key={allowedUser}>{allowedUser}</li>;
+          }
         })}
       </ul>
     </div>
@@ -103,3 +110,4 @@ export default function StoryHome() {
 // or maybe set a public/private setting. and if it's public, then allowed users can change background and be admins?)
 // only the author can kick/add allowed users
 // can we change owner?
+// switch database and hosting and storage to private????

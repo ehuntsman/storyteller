@@ -10,26 +10,37 @@ export default function UserTemplate() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchUser();
+    if(!user && !loading){
+      navigate("/")
+    }
+    if(!loading){
+      fetchUser();
+    }
   }, [user, loading]);
 
   const fetchUser = async () => {
-    try {
-      const q = query(collection(firestore, "users"), where("uid", "==", user?.uid));
-      const doc = await getDocs(q);
-      const data = doc.docs[0].data();
-      setLoggedUser(data);
-    } catch (err) {
-      console.error(err);
+    if(user?.uid){
+      try {
+        const q = query(collection(firestore, "users"), where("uid", "==", user?.uid));
+        const doc = await getDocs(q);
+        const data = doc.docs[0].data();
+        setLoggedUser(data);
+      } catch (err) {
+        console.error(err);
+      }
     }
   };
+
+  const logUserOut = () => {
+    logout();
+  }
 
   return (
     <div>
       <h1>Hello, {loggedUser.username}!</h1>
       <ul>
         <li><Link to="/dashboard">dashboard</Link></li>
-        <li><button onClick={logout}>logout</button></li>
+        <li><button onClick={logUserOut}>logout</button></li>
       </ul>
       <Outlet />
     </div>

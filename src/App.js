@@ -15,6 +15,7 @@ function App() {
       <BrowserRouter>
         <UserProvider>
           <Routes>
+            <Route exact path="/" element={<Login />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route element={<UserTemplate />}>

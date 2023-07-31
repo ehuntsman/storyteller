@@ -1,0 +1,107 @@
+$teal:      #3DCAC2;
+  $blue:      #1A688A;
+  $pink:      #C0156B;
+  $green:     #71A60F;
+  $yellow:    #FFE35A;
+  $darkgrey:  #373B3E;
+  $grey:      #535556;
+  $purple:    #9377A5;
+  $darkpurple:#312B56;
+  $tan:       #EAD4C0;
+  $lighttan:  #ECDFCD;
+  $midtan:    #DABDAB;
+  $darktan:   #AA8677;
+  $light:     #E0E6E2;
+
+  
+.home-page {
+    text-align: center;
+    background: $darkgrey;
+    background: url('./worlds.png') no-repeat;
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+  }
+
+  .home-container {
+    z-index: 2;
+    position: absolute;
+    top: 10vh;
+    left: 20vw;
+    right: 20vw;
+    .home-links {
+      button {
+        background: url('./bluebutton.png');
+        background-position: center;
+        border: none;
+        width: 60vw;
+        max-width: 241px;
+        height: 50px;
+        color: white;
+        padding: 10px 0;
+        font-family: 'IM Fell French Canon', serif;
+        font-size: 16px;
+        cursor: pointer;
+        &:hover {
+          box-shadow: 0px 0px 20px 10px rgba(255,255,255,0.5);
+        }
+      }
+    }
+  }
+
+  .clouds-wrapper {
+    overflow: hidden;
+    height: 100%;
+    width: 100vw;
+    padding: 0;
+    margin: 0 auto;
+    z-index: 1;
+    .first {
+      position: relative;
+    }
+    .cloud1 {
+      position: absolute;
+      left: 0;
+      top: 50px;
+      animation-name: cloud;
+      animation-duration: 20s;
+      animation-iteration-count: infinite;
+      -webkit-animation-timing-function: linear;
+      animation-timing-function: linear;
+    }
+    .cloud2 {
+      position: absolute;
+      right: 0;
+      top: 0;
+      animation-name: cloud2;
+      animation-duration: 50s;
+      animation-iteration-count: infinite;
+      -webkit-animation-timing-function: linear;
+      animation-timing-function: linear;
+    }
+  }
+
+  @keyframes cloud{
+    0%{
+      opacity: 0;
+      transform: translate3d(-100vw,-500px,  0px);
+    }
+    100%{
+      opacity: 1;
+      transform: translate3d(100vw,100px,  0px);    
+    }
+  }
+  @keyframes cloud2{
+    0%{
+      opacity: 0;
+      transform: translate3d(100vw,0px,  0px);
+    }
+    60%{
+      opacity: 0.5;
+      transform: translate3d(-50vw,50px,  0px);    
+    }
+    100%{
+      opacity: 0;
+      transform: translate3d(-75vw,20px,  0px);    
+    }
+  }

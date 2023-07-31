@@ -3,33 +3,18 @@ import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { query, collection, getDocs, where, addDoc, doc, setDoc } from "firebase/firestore";
 import { auth, db, logout, firestore } from "../service/firebase"
+import { useUserContext } from '../context/UserContext';
 
 export default function UserTemplate() {
-  const [user, loading, error] = useAuthState(auth);
-  const [loggedUser, setLoggedUser] = useState({})
+  const [loading, error] = useAuthState(auth);
+  const { user, loggedUser } = useUserContext();
   const navigate = useNavigate();
 
   useEffect(() => {
     if(!user && !loading){
       navigate("/")
     }
-    if(!loading){
-      fetchUser();
-    }
   }, [user, loading]);
-
-  const fetchUser = async () => {
-    if(user?.uid){
-      try {
-        const q = query(collection(firestore, "users"), where("uid", "==", user?.uid));
-        const doc = await getDocs(q);
-        const data = doc.docs[0].data();
-        setLoggedUser(data);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-  };
 
   const logUserOut = () => {
     logout();
@@ -39,6 +24,7 @@ export default function UserTemplate() {
     <div>
       <h1>Hello, {loggedUser.username}!</h1>
       <ul>
+        <li><Link to="/">home</Link></li>
         <li><Link to="/dashboard">dashboard</Link></li>
         <li><button onClick={logUserOut}>logout</button></li>
       </ul>
